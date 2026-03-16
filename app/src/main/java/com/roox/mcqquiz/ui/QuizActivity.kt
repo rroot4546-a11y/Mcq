@@ -94,11 +94,16 @@ class QuizActivity : AppCompatActivity() {
         btnPrevious.setOnClickListener { viewModel.previousQuestion() }
 
         btnAiExplain.setOnClickListener {
-            val apiKey = prefs.getString("gemini_api_key", "") ?: ""
-            if (apiKey.isBlank()) {
-                Toast.makeText(this, "Please set your Gemini API key in Settings", Toast.LENGTH_LONG).show()
+            val provider = prefs.getString("ai_provider", "gemini")
+            val hasConfig = if (provider == "ollama") {
+                prefs.getString("ollama_url", "")?.isNotBlank() == true
             } else {
-                viewModel.requestAiExplanation(apiKey)
+                prefs.getString("gemini_api_key", "")?.isNotBlank() == true
+            }
+            if (!hasConfig) {
+                Toast.makeText(this, "Please configure AI in Settings first", Toast.LENGTH_LONG).show()
+            } else {
+                viewModel.requestAiExplanation(prefs)
             }
         }
     }

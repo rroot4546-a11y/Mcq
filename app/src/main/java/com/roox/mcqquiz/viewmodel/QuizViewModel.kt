@@ -7,6 +7,7 @@ import com.roox.mcqquiz.MCQApplication
 import com.roox.mcqquiz.data.model.Question
 import com.roox.mcqquiz.data.model.Quiz
 import com.roox.mcqquiz.service.AiService
+import com.roox.mcqquiz.service.AiProvider
 import com.roox.mcqquiz.service.PdfParserService
 import kotlinx.coroutines.launch
 
@@ -153,11 +154,11 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun requestAiExplanation(apiKey: String) {
+    fun requestAiExplanation(prefs: android.content.SharedPreferences) {
         val question = _currentQuestion.value ?: return
         viewModelScope.launch {
             _isLoading.value = true
-            val aiService = AiService(apiKey)
+            val aiService = AiService.fromPrefs(prefs)
             val options = listOfNotNull(
                 "A) ${question.optionA}",
                 "B) ${question.optionB}",
