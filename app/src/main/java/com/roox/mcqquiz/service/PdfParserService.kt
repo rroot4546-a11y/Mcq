@@ -70,7 +70,8 @@ class PdfParserService(private val context: Context) {
 
         // Collect question text: everything from after the number until first option
         val optionRegex = Regex("""^\s*([A-E])[.)]\s+(.+)""")
-        val answerRegex = Regex("""Answer:\s*([A-E])""", RegexOption.IGNORE_CASE)
+        // Match various answer formats: "Answer: B", "Ans: B", "B.", "B)", "correct: B"
+        val answerRegex = Regex("""(?:Answer|Ans|Correct)[:\s]*([A-E])""", RegexOption.IGNORE_CASE)
 
         val questionLines = mutableListOf<String>()
         val options = mutableMapOf<String, String>()
@@ -145,8 +146,8 @@ class PdfParserService(private val context: Context) {
     }
 
     private fun fillAnswersFromText(questions: MutableList<Question>, text: String) {
-        // Look for answer patterns: "16.1. Answer: B" or "1. B"
-        val answerPattern = Regex("""(\d+\.?\d*)\.\s*(?:Answer:\s*)?([A-E])[.)]*\s*(.*)""", RegexOption.IGNORE_CASE)
+        // Look for answer patterns: "16.1. Answer: B" or "16.1. B" or "16.1 B."
+        val answerPattern = Regex("""(\d+\.?\d*)\.\s*(?:Answer|Ans|Correct)?[:\s]*([A-E])[.)]*\s*(.*)""", RegexOption.IGNORE_CASE)
 
         for (match in answerPattern.findAll(text)) {
             val qNum = match.groupValues[1]

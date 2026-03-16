@@ -2,6 +2,7 @@ package com.roox.mcqquiz.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.*
 import com.roox.mcqquiz.MCQApplication
 import com.roox.mcqquiz.data.model.Question
@@ -18,7 +19,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     val allQuizzes: LiveData<List<Quiz>> = repository.allQuizzes
 
-    // Current quiz state
     private val _currentQuestion = MutableLiveData<Question?>()
     val currentQuestion: LiveData<Question?> = _currentQuestion
 
@@ -43,7 +43,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     private var currentQuestions: List<Question> = emptyList()
     private var currentQuizMode: QuizMode = QuizMode.STUDY
 
-    // Statistics
     private val _stats = MutableLiveData<QuizStats>()
     val stats: LiveData<QuizStats> = _stats
 
@@ -66,11 +65,8 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Create quiz entry
                 val quiz = Quiz(title = fileName.removeSuffix(".pdf"), sourceFileName = fileName)
                 val quizId = repository.insertQuiz(quiz).toInt()
-
-                // Parse PDF
                 val questions = pdfParser.parsePdf(uri, quizId)
 
                 if (questions.isEmpty()) {
@@ -78,12 +74,8 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                     return@launch
                 }
 
-                // Save questions
                 repository.insertQuestions(questions)
-
-                // Update quiz with question count
                 repository.updateQuiz(quiz.copy(id = quizId, totalQuestions = questions.size))
-
                 _errorMessage.value = null
             } catch (e: Exception) {
                 _errorMessage.value = "Error importing PDF: ${e.message}"
@@ -106,28 +98,36 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 _currentQuestion.value = currentQuestions[0]
             }
             _answerResult.value = null
+            _aiExplanation.value = ""
         }
     }
 
     fun submitAnswer(selectedAnswer: String) {
         val question = _currentQuestion.value ?: return
-        val isCorrect = selectedAnswer.equals(question.correctAnswer, ignoreCase = true)
+
+        // Normalize: trim whitespace, take first letter, uppercase
+        val selected = selectedAnswer.trim().uppercase().firstOrNull()?.toString() ?: ""
+        val correct = question.correctAnswer.trim().uppercase().firstOrNull()?.toString() ?: ""
+
+        Log.d("MCQQuiz", "Selected: '$selected' | Correct: '$correct' | Raw correct: '${question.correctAnswer}'")
+
+        val isCorrect = selected == correct && correct.isNotEmpty()
 
         val result = AnswerResult(
             isCorrect = isCorrect,
-            correctAnswer = question.correctAnswer,
+            correctAnswer = question.correctAnswer.trim().uppercase(),
             explanation = question.explanation,
-            selectedAnswer = selectedAnswer
+            selectedAnswer = selected
         )
 
-        // Update question in database
         viewModelScope.launch {
             repository.updateQuestion(question.copy(
-                userAnswer = selectedAnswer,
+                userAnswer = selected,
                 isAnsweredCorrectly = isCorrect
             ))
         }
 
+        // Always show result in STUDY and REVIEW modes
         when (currentQuizMode) {
             QuizMode.STUDY -> _answerResult.value = result
             QuizMode.EXAM -> { /* Show results only at end */ }
@@ -151,6 +151,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             _questionIndex.value = idx
             _currentQuestion.value = currentQuestions[idx]
             _answerResult.value = null
+            _aiExplanation.value = ""
         }
     }
 
@@ -170,8 +171,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 question.questionText, options, question.correctAnswer
             )
             _aiExplanation.value = explanation
-
-            // Cache the AI explanation
             repository.updateQuestion(question.copy(aiExplanation = explanation))
             _isLoading.value = false
         }

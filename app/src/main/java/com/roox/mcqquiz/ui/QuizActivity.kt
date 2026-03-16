@@ -168,24 +168,31 @@ class QuizActivity : AppCompatActivity() {
             result?.let {
                 tvResult.visibility = View.VISIBLE
 
-                if (it.isCorrect) {
+                if (it.correctAnswer.isBlank()) {
+                    // No correct answer in PDF — just show what was selected
+                    tvResult.text = "📝 You selected: ${it.selectedAnswer} (correct answer not available in PDF)"
+                    tvResult.setTextColor(ContextCompat.getColor(this, R.color.accent_blue))
+                } else if (it.isCorrect) {
                     tvResult.text = "✅ Correct!"
                     tvResult.setTextColor(ContextCompat.getColor(this, R.color.correct_green))
+                    // Highlight selected (correct) in green
+                    highlightCorrectAnswer(it.selectedAnswer)
                 } else {
                     tvResult.text = "❌ Wrong — Correct answer: ${it.correctAnswer}"
                     tvResult.setTextColor(ContextCompat.getColor(this, R.color.wrong_red))
-                    // Highlight the wrong selected answer in red
+                    // Highlight selected in red
                     highlightWrongAnswer(it.selectedAnswer)
+                    // Highlight correct in green
+                    highlightCorrectAnswer(it.correctAnswer)
                 }
 
-                // Always highlight correct answer in green
-                highlightCorrectAnswer(it.correctAnswer)
-
+                // Always show explanation if available
                 if (it.explanation.isNotBlank()) {
                     tvExplanation.visibility = View.VISIBLE
-                    tvExplanation.text = it.explanation
+                    tvExplanation.text = "📖 ${it.explanation}"
                 }
 
+                // Always show AI explain button
                 btnAiExplain.visibility = View.VISIBLE
                 disableOptions()
             }
