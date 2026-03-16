@@ -1,10 +1,12 @@
 package com.roox.mcqquiz.ui
 
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
 import com.roox.mcqquiz.R
@@ -23,14 +25,20 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var tvResult: TextView
     private lateinit var tvExplanation: TextView
     private lateinit var tvAiExplanation: TextView
-    private lateinit var btnAiExplain: Button
-    private lateinit var btnNext: Button
-    private lateinit var btnPrevious: Button
+    private lateinit var btnAiExplain: MaterialButton
+    private lateinit var btnNext: MaterialButton
+    private lateinit var btnPrevious: MaterialButton
     private lateinit var progressBar: ProgressBar
     private lateinit var progressQuiz: ProgressBar
+    private lateinit var tvProgress: TextView
 
     private var selectedAnswer: String? = null
+    private var hasAnswered = false
     private lateinit var prefs: SharedPreferences
+
+    // Store default button style to reset later
+    private var defaultStrokeColor: ColorStateList? = null
+    private var defaultTextColor: ColorStateList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +78,15 @@ class QuizActivity : AppCompatActivity() {
         btnPrevious = findViewById(R.id.btnPrevious)
         progressBar = findViewById(R.id.progressLoading)
         progressQuiz = findViewById(R.id.progressQuiz)
+        tvProgress = findViewById(R.id.tvProgress)
+
+        // Save default button colors for reset
+        defaultStrokeColor = btnOptionA.strokeColor
+        defaultTextColor = btnOptionA.textColors
 
         val optionClickListener = View.OnClickListener { v ->
+            if (hasAnswered) return@OnClickListener
+
             selectedAnswer = when (v.id) {
                 R.id.btnOptionA -> "A"
                 R.id.btnOptionB -> "B"
@@ -80,8 +95,11 @@ class QuizActivity : AppCompatActivity() {
                 R.id.btnOptionE -> "E"
                 else -> null
             }
-            selectedAnswer?.let { viewModel.submitAnswer(it) }
-            disableOptions()
+            selectedAnswer?.let {
+                hasAnswered = true
+                highlightSelected(v as MaterialButton)
+                viewModel.submitAnswer(it)
+            }
         }
 
         btnOptionA.setOnClickListener(optionClickListener)
@@ -95,10 +113,10 @@ class QuizActivity : AppCompatActivity() {
 
         btnAiExplain.setOnClickListener {
             val provider = prefs.getString("ai_provider", "gemini")
-            val hasConfig = if (provider == "ollama") {
-                prefs.getString("ollama_url", "")?.isNotBlank() == true
-            } else {
-                prefs.getString("gemini_api_key", "")?.isNotBlank() == true
+            val hasConfig = when (provider) {
+                "ollama" -> prefs.getString("ollama_url", "")?.isNotBlank() == true
+                "custom" -> prefs.getString("custom_api_url", "")?.isNotBlank() == true
+                else -> prefs.getString("gemini_api_key", "")?.isNotBlank() == true
             }
             if (!hasConfig) {
                 Toast.makeText(this, "Please configure AI in Settings first", Toast.LENGTH_LONG).show()
@@ -113,19 +131,22 @@ class QuizActivity : AppCompatActivity() {
             question?.let {
                 tvQuestionNumber.text = "Question ${it.questionNumber}"
                 tvQuestionText.text = it.questionText
-                btnOptionA.text = "A) ${it.optionA}"
-                btnOptionB.text = "B) ${it.optionB}"
-                btnOptionC.text = "C) ${it.optionC}"
-                btnOptionD.text = "D) ${it.optionD}"
+                btnOptionA.text = "A)  ${it.optionA}"
+                btnOptionB.text = "B)  ${it.optionB}"
+                btnOptionC.text = "C)  ${it.optionC}"
+                btnOptionD.text = "D)  ${it.optionD}"
 
                 if (it.optionE != null) {
                     btnOptionE.visibility = View.VISIBLE
-                    btnOptionE.text = "E) ${it.optionE}"
+                    btnOptionE.text = "E)  ${it.optionE}"
                 } else {
                     btnOptionE.visibility = View.GONE
                 }
 
-                enableOptions()
+                // RESET everything for new question
+                resetAllButtons()
+                hasAnswered = false
+                selectedAnswer = null
                 tvResult.visibility = View.GONE
                 tvExplanation.visibility = View.GONE
                 tvAiExplanation.visibility = View.GONE
@@ -138,6 +159,7 @@ class QuizActivity : AppCompatActivity() {
             if (total > 0) {
                 progressQuiz.max = total
                 progressQuiz.progress = idx + 1
+                tvProgress.text = "${idx + 1} / $total"
             }
             btnPrevious.isEnabled = idx > 0
         }
@@ -145,8 +167,19 @@ class QuizActivity : AppCompatActivity() {
         viewModel.answerResult.observe(this) { result ->
             result?.let {
                 tvResult.visibility = View.VISIBLE
-                tvResult.text = if (it.isCorrect) "✅ Correct!" else "❌ Incorrect. Answer: ${it.correctAnswer}"
-                tvResult.setTextColor(getColor(if (it.isCorrect) android.R.color.holo_green_dark else android.R.color.holo_red_dark))
+
+                if (it.isCorrect) {
+                    tvResult.text = "✅ Correct!"
+                    tvResult.setTextColor(ContextCompat.getColor(this, R.color.correct_green))
+                } else {
+                    tvResult.text = "❌ Wrong — Correct answer: ${it.correctAnswer}"
+                    tvResult.setTextColor(ContextCompat.getColor(this, R.color.wrong_red))
+                    // Highlight the wrong selected answer in red
+                    highlightWrongAnswer(it.selectedAnswer)
+                }
+
+                // Always highlight correct answer in green
+                highlightCorrectAnswer(it.correctAnswer)
 
                 if (it.explanation.isNotBlank()) {
                     tvExplanation.visibility = View.VISIBLE
@@ -154,12 +187,12 @@ class QuizActivity : AppCompatActivity() {
                 }
 
                 btnAiExplain.visibility = View.VISIBLE
-                highlightCorrectAnswer(it.correctAnswer)
+                disableOptions()
             }
         }
 
         viewModel.aiExplanation.observe(this) { explanation ->
-            if (explanation.isNotBlank()) {
+            if (!explanation.isNullOrBlank()) {
                 tvAiExplanation.visibility = View.VISIBLE
                 tvAiExplanation.text = "🤖 AI Explanation:\n\n$explanation"
             }
@@ -167,25 +200,67 @@ class QuizActivity : AppCompatActivity() {
 
         viewModel.isLoading.observe(this) { loading ->
             progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            btnAiExplain.isEnabled = !loading
         }
     }
 
-    private fun enableOptions() {
-        listOf(btnOptionA, btnOptionB, btnOptionC, btnOptionD, btnOptionE).forEach {
-            it.isEnabled = true
-            it.alpha = 1f
+    private fun resetAllButtons() {
+        val allButtons = listOf(btnOptionA, btnOptionB, btnOptionC, btnOptionD, btnOptionE)
+        allButtons.forEach { btn ->
+            btn.isEnabled = true
+            btn.alpha = 1f
+            btn.strokeColor = defaultStrokeColor ?: ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.primary)
+            )
+            btn.setTextColor(defaultTextColor ?: ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.primary)
+            ))
+            btn.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(this, android.R.color.transparent)
+            )
+            btn.iconTint = null
         }
     }
 
     private fun disableOptions() {
-        listOf(btnOptionA, btnOptionB, btnOptionC, btnOptionD, btnOptionE).forEach {
-            it.isEnabled = false
-            it.alpha = 0.7f
-        }
+        val allButtons = listOf(btnOptionA, btnOptionB, btnOptionC, btnOptionD, btnOptionE)
+        allButtons.forEach { it.isEnabled = false }
+    }
+
+    private fun highlightSelected(button: MaterialButton) {
+        button.strokeWidth = 4
     }
 
     private fun highlightCorrectAnswer(correct: String) {
-        val correctBtn = when (correct.uppercase()) {
+        val btn = getButtonForAnswer(correct) ?: return
+        btn.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.correct_green_bg)
+        )
+        btn.setTextColor(ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.correct_green_text)
+        ))
+        btn.strokeColor = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.correct_green)
+        )
+        btn.strokeWidth = 3
+    }
+
+    private fun highlightWrongAnswer(selected: String) {
+        val btn = getButtonForAnswer(selected) ?: return
+        btn.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.wrong_red_bg)
+        )
+        btn.setTextColor(ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.wrong_red_text)
+        ))
+        btn.strokeColor = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.wrong_red)
+        )
+        btn.strokeWidth = 3
+    }
+
+    private fun getButtonForAnswer(answer: String): MaterialButton? {
+        return when (answer.uppercase()) {
             "A" -> btnOptionA
             "B" -> btnOptionB
             "C" -> btnOptionC
@@ -193,6 +268,5 @@ class QuizActivity : AppCompatActivity() {
             "E" -> btnOptionE
             else -> null
         }
-        correctBtn?.setBackgroundColor(getColor(android.R.color.holo_green_light))
     }
 }

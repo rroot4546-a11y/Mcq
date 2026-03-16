@@ -6,4 +6,22 @@
     <color name="secondary_variant">#d32f2f</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+
+    <!-- Quiz answer colors -->
+    <color name="correct_green">#2e7d32</color>
+    <color name="correct_green_bg">#E8F5E9</color>
+    <color name="correct_green_text">#1B5E20</color>
+    <color name="wrong_red">#c62828</color>
+    <color name="wrong_red_bg">#FFEBEE</color>
+    <color name="wrong_red_text">#B71C1C</color>
+
+    <!-- Modern UI -->
+    <color name="surface">#FAFAFA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#EEEEEE</color>
+    <color name="accent_blue">#1565C0</color>
+    <color name="ai_bg">#E3F2FD</color>
+    <color name="ai_text">#0D47A1</color>
 </resources>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +16,7 @@
             android:text="⚙️ AI Settings"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#1a237e"
+            android:textColor="@color/primary"
             android:paddingBottom="24dp" />
 
         <TextView
@@ -37,7 +38,8 @@
                 android:layout_height="wrap_content"
                 android:text="🤖 Google Gemini (Free API Key)"
                 android:textSize="15sp"
-                android:checked="true" />
+                android:checked="true"
+                android:paddingBottom="4dp" />
 
             <RadioButton
                 android:id="@+id/radioOllama"
@@ -45,10 +47,17 @@
                 android:layout_height="wrap_content"
                 android:text="🦙 Ollama (Self-hosted or Cloud)"
                 android:textSize="15sp"
-                android:paddingTop="8dp" />
+                android:paddingBottom="4dp" />
+
+            <RadioButton
+                android:id="@+id/radioCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔧 Custom AI (OpenAI-compatible API)"
+                android:textSize="15sp" />
         </RadioGroup>
 
-        <!-- Gemini Settings -->
+        <!-- Gemini -->
         <LinearLayout
             android:id="@+id/layoutGemini"
             android:layout_width="match_parent"
@@ -58,16 +67,15 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Get a free key from aistudio.google.com/apikey"
+                android:text="Free key from aistudio.google.com/apikey"
                 android:textSize="13sp"
-                android:textColor="#666"
+                android:textColor="@color/text_secondary"
                 android:paddingBottom="8dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Gemini API Key">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etApiKey"
                     android:layout_width="match_parent"
@@ -77,7 +85,7 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Ollama Settings -->
+        <!-- Ollama -->
         <LinearLayout
             android:id="@+id/layoutOllama"
             android:layout_width="match_parent"
@@ -88,9 +96,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Enter your Ollama server URL and model name.\n\nLocal: http://localhost:11434\nCloud: your server URL"
+                android:text="Local: http://localhost:11434\nCloud: your server URL"
                 android:textSize="13sp"
-                android:textColor="#666"
+                android:textColor="@color/text_secondary"
                 android:paddingBottom="8dp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -98,45 +106,88 @@
                 android:layout_height="wrap_content"
                 android:hint="Ollama Server URL"
                 android:paddingBottom="8dp">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etOllamaUrl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textUri"
-                    android:text="http://localhost:11434"
                     android:fontFamily="monospace" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Model Name"
-                android:paddingBottom="8dp">
-
+                android:hint="Model Name">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etOllamaModel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
-                    android:text="llama3"
                     android:fontFamily="monospace" />
             </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Custom AI -->
+        <LinearLayout
+            android:id="@+id/layoutCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Popular models: llama3, mistral, gemma2, qwen2, phi3, codellama, meditron"
-                android:textSize="12sp"
-                android:textColor="#888"
-                android:paddingBottom="4dp" />
+                android:text="Any OpenAI-compatible API:\nOpenRouter, Together AI, Groq, local LLMs, etc.\n\nURL format: https://api.example.com/v1/chat/completions"
+                android:textSize="13sp"
+                android:textColor="@color/text_secondary"
+                android:paddingBottom="8dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="API Base URL"
+                android:paddingBottom="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"
+                    android:fontFamily="monospace" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Model Name (e.g. gpt-4o, claude-3, llama-3)"
+                android:paddingBottom="8dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:fontFamily="monospace" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="API Key (if required)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCustomApiKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:fontFamily="monospace" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
+        <!-- Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="16dp"
+            android:paddingTop="20dp"
             android:paddingBottom="16dp">
 
             <Button
@@ -162,8 +213,8 @@
             android:layout_height="wrap_content"
             android:text="No AI provider configured"
             android:textSize="14sp"
-            android:textColor="#666"
+            android:textColor="@color/text_secondary"
             android:padding="12dp"
-            android:background="#f5f6fa" />
+            android:background="@color/divider" />
     </LinearLayout>
 </ScrollView>
