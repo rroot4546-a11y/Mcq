@@ -24,5 +24,6 @@
         </activity>
 
         <activity android:name=".ui.QuizActivity" />
+        <activity android:name=".ui.SettingsActivity" />
     </application>
 </manifest>

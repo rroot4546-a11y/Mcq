@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var btnImport: Button
     private lateinit var btnStats: Button
+    private lateinit var btnSettings: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var tvEmpty: TextView
 
@@ -61,8 +62,14 @@ class MainActivity : AppCompatActivity() {
             pdfPicker.launch(intent)
         }
 
+        btnSettings = findViewById(R.id.btnSettings)
+
         btnStats.setOnClickListener {
             showStatsDialog()
+        }
+
+        btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         viewModel.allQuizzes.observe(this) { quizzes ->

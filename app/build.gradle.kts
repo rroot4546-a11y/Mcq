@@ -65,10 +65,13 @@ dependencies {
     // OCR (ML Kit)
     implementation("com.google.mlkit:text-recognition:16.0.0")
 
-    // Networking (for AI API)
+    // Google Generative AI (Gemini) - Official SDK
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // Networking
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    // Preferences
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    // Lifecycle scope for Settings
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }

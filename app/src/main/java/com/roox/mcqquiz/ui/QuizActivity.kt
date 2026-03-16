@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.roox.mcqquiz.R
 import com.roox.mcqquiz.viewmodel.QuizViewModel
@@ -38,7 +37,7 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         viewModel = ViewModelProvider(this)[QuizViewModel::class.java]
-        prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs = getSharedPreferences("mcq_prefs", MODE_PRIVATE)
 
         initViews()
 
