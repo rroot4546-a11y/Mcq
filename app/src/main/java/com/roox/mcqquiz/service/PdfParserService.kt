@@ -6,7 +6,6 @@ import com.roox.mcqquiz.data.model.Question
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
-import java.util.regex.Pattern
 
 class PdfParserService(private val context: Context) {
 
@@ -28,75 +27,108 @@ class PdfParserService(private val context: Context) {
     }
 
     private fun parseQuestionsFromText(text: String, quizId: Int): List<Question> {
+        // Strategy: split into question blocks, then parse each block
+        // Handles multi-line questions and various formats
+
         val questions = mutableListOf<Question>()
 
-        // Pattern to match question blocks like "16.1." or "Q1." or "1."
-        val questionPattern = Pattern.compile(
-            """(\d+\.?\d*)\.\s*(.*?)(?=\d+\.?\d*\.\s|$)""",
-            Pattern.DOTALL
-        )
+        // Normalize line endings
+        val normalized = text.replace("\r\n", "\n").replace("\r", "\n")
 
-        // Split text into question-answer pairs
-        val blocks = text.split(Regex("""\n(?=\d+\.?\d*\.\s)"""))
+        // Split into blocks at question numbers (e.g. "16.1." or "1." or "Q1.")
+        val questionRegex = Regex("""(?:^|\n)(\d+\.?\d*)\.\s""")
+        val matches = questionRegex.findAll(normalized).toList()
 
-        var questionNum = 0
-        var i = 0
-        while (i < blocks.size) {
-            val block = blocks[i].trim()
-            if (block.isEmpty()) { i++; continue }
+        if (matches.isEmpty()) {
+            // Try alternate format: "Q1." or "Question 1:"
+            return parseAlternateFormat(normalized, quizId)
+        }
 
-            // Check if this block contains "Answer:"
-            if (block.contains("Answer:") || block.contains("answer:")) {
-                i++; continue
-            }
+        for (i in matches.indices) {
+            val start = matches[i].range.first
+            val end = if (i + 1 < matches.size) matches[i + 1].range.first else normalized.length
+            val block = normalized.substring(start, end).trim()
+            val qNumber = matches[i].groupValues[1]
 
-            // Try to extract question components
-            val parsed = parseQuestionBlock(block, quizId, questionNum)
+            val parsed = parseBlock(block, qNumber, quizId)
             if (parsed != null) {
-                // Look for answer in next block
-                val answerBlock = if (i + 1 < blocks.size) blocks[i + 1].trim() else ""
-                val (correctAnswer, explanation) = extractAnswer(answerBlock, block)
-
-                questions.add(parsed.copy(
-                    correctAnswer = correctAnswer,
-                    explanation = explanation
-                ))
-                questionNum++
-                if (answerBlock.contains("Answer:") || answerBlock.contains("answer:")) {
-                    i += 2
-                } else {
-                    i++
-                }
-            } else {
-                i++
+                questions.add(parsed)
             }
         }
 
-        // Fallback: try a simpler regex-based approach if the above didn't work well
-        if (questions.isEmpty()) {
-            return parseWithSimpleRegex(text, quizId)
+        // Try to find answers section (some PDFs have questions first, then answers)
+        if (questions.isNotEmpty() && questions.all { it.correctAnswer.isBlank() }) {
+            fillAnswersFromText(questions, normalized)
         }
 
         return questions
     }
 
-    private fun parseQuestionBlock(block: String, quizId: Int, questionNum: Int): Question? {
-        val lines = block.lines().filter { it.isNotBlank() }
-        if (lines.size < 3) return null
+    private fun parseBlock(block: String, qNumber: String, quizId: Int): Question? {
+        val lines = block.lines()
+        if (lines.isEmpty()) return null
 
-        val numberMatch = Regex("""^(\d+\.?\d*)\.\s*""").find(lines[0])
-        val qNumber = numberMatch?.groupValues?.get(1) ?: questionNum.toString()
-        val questionText = lines[0].replace(Regex("""^\d+\.?\d*\.\s*"""), "").trim()
+        // Collect question text: everything from after the number until first option
+        val optionRegex = Regex("""^\s*([A-E])[.)]\s+(.+)""")
+        val answerRegex = Regex("""Answer:\s*([A-E])""", RegexOption.IGNORE_CASE)
 
+        val questionLines = mutableListOf<String>()
         val options = mutableMapOf<String, String>()
-        for (line in lines.drop(1)) {
-            val optMatch = Regex("""^\s*([A-E])[.)]\s*(.+)""").find(line.trim())
+        var currentOption: String? = null
+        var correctAnswer = ""
+        val explanationLines = mutableListOf<String>()
+        var foundAnswer = false
+
+        for (line in lines) {
+            val trimmed = line.trim()
+            if (trimmed.isBlank()) continue
+
+            // Check if this is an answer line
+            val answerMatch = answerRegex.find(trimmed)
+            if (answerMatch != null) {
+                correctAnswer = answerMatch.groupValues[1]
+                val afterAnswer = trimmed.substring(answerMatch.range.last + 1).trim()
+                if (afterAnswer.isNotBlank()) {
+                    explanationLines.add(afterAnswer)
+                }
+                foundAnswer = true
+                continue
+            }
+
+            if (foundAnswer) {
+                explanationLines.add(trimmed)
+                continue
+            }
+
+            // Check if this is an option line
+            val optMatch = optionRegex.find(trimmed)
             if (optMatch != null) {
-                options[optMatch.groupValues[1]] = optMatch.groupValues[2].trim()
+                currentOption = optMatch.groupValues[1]
+                options[currentOption] = optMatch.groupValues[2].trim()
+                continue
+            }
+
+            // If we're in an option, this line continues it
+            if (currentOption != null) {
+                options[currentOption] = (options[currentOption] ?: "") + " " + trimmed
+                continue
+            }
+
+            // Otherwise it's part of the question text
+            // Remove the leading question number from first line
+            val cleaned = if (questionLines.isEmpty()) {
+                trimmed.replace(Regex("""^\d+\.?\d*\.\s*"""), "")
+            } else {
+                trimmed
+            }
+            if (cleaned.isNotBlank()) {
+                questionLines.add(cleaned)
             }
         }
 
-        if (options.size < 2) return null
+        // Need at least question text and 2 options
+        val questionText = questionLines.joinToString(" ").trim()
+        if (questionText.isBlank() || options.size < 2) return null
 
         return Question(
             quizId = quizId,
@@ -107,50 +139,44 @@ class PdfParserService(private val context: Context) {
             optionC = options["C"] ?: "",
             optionD = options["D"] ?: "",
             optionE = options["E"],
-            correctAnswer = "",
-            explanation = ""
+            correctAnswer = correctAnswer,
+            explanation = explanationLines.joinToString(" ").trim()
         )
     }
 
-    private fun extractAnswer(answerBlock: String, questionBlock: String): Pair<String, String> {
-        val answerMatch = Regex("""Answer:\s*([A-E])""", RegexOption.IGNORE_CASE).find(answerBlock)
-            ?: Regex("""Answer:\s*([A-E])""", RegexOption.IGNORE_CASE).find(questionBlock)
+    private fun fillAnswersFromText(questions: MutableList<Question>, text: String) {
+        // Look for answer patterns: "16.1. Answer: B" or "1. B"
+        val answerPattern = Regex("""(\d+\.?\d*)\.\s*(?:Answer:\s*)?([A-E])[.)]*\s*(.*)""", RegexOption.IGNORE_CASE)
 
-        val correctAnswer = answerMatch?.groupValues?.get(1) ?: ""
+        for (match in answerPattern.findAll(text)) {
+            val qNum = match.groupValues[1]
+            val answer = match.groupValues[2]
+            val explanation = match.groupValues[3].trim()
 
-        // Extract explanation (everything after the answer letter)
-        val explanation = if (answerMatch != null) {
-            answerBlock.substring(answerMatch.range.last + 1).trim()
-                .replace(Regex("""^\.\s*"""), "")
-                .trim()
-        } else ""
-
-        return Pair(correctAnswer, explanation)
+            val idx = questions.indexOfFirst { it.questionNumber == qNum && it.correctAnswer.isBlank() }
+            if (idx >= 0) {
+                questions[idx] = questions[idx].copy(
+                    correctAnswer = answer,
+                    explanation = explanation
+                )
+            }
+        }
     }
 
-    private fun parseWithSimpleRegex(text: String, quizId: Int): List<Question> {
+    private fun parseAlternateFormat(text: String, quizId: Int): List<Question> {
         val questions = mutableListOf<Question>()
 
-        // Match patterns like "16.1. Question text\nA. option\nB. option..."
-        val pattern = Regex(
-            """(\d+\.?\d*)\.\s+(.+?)\s+A[.)]\s+(.+?)\s+B[.)]\s+(.+?)\s+C[.)]\s+(.+?)\s+D[.)]\s+(.+?)(?:\s+E[.)]\s+(.+?))?\s+\d+\.?\d*\.\s+Answer:\s*([A-E])\s*[.)]?\s*(.*)""",
-            setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE)
-        )
+        // Try "Question X:" or "Q X:" format
+        val altRegex = Regex("""(?:Question|Q)\s*(\d+)[.:]\s*(.+?)(?=(?:Question|Q)\s*\d+[.:]|\z)""",
+            setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
 
-        val matches = pattern.findAll(text)
-        for (match in matches) {
-            questions.add(Question(
-                quizId = quizId,
-                questionNumber = match.groupValues[1],
-                questionText = match.groupValues[2].trim(),
-                optionA = match.groupValues[3].trim(),
-                optionB = match.groupValues[4].trim(),
-                optionC = match.groupValues[5].trim(),
-                optionD = match.groupValues[6].trim(),
-                optionE = match.groupValues[7].takeIf { it.isNotBlank() }?.trim(),
-                correctAnswer = match.groupValues[8].trim(),
-                explanation = match.groupValues[9].trim()
-            ))
+        for (match in altRegex.findAll(text)) {
+            val qNum = match.groupValues[1]
+            val block = match.groupValues[2].trim()
+            val parsed = parseBlock("$qNum. $block", qNum, quizId)
+            if (parsed != null) {
+                questions.add(parsed)
+            }
         }
 
         return questions
