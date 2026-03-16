@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.MCQQuizApp" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">#1a237e</item>
-        <item name="colorPrimaryVariant">#0d47a1</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSecondary">#b71c1c</item>
-        <item name="colorSecondaryVariant">#d32f2f</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
     </style>
 </resources>
