@@ -17,7 +17,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.view.View
 import com.roox.mcqquiz.R
 import com.roox.mcqquiz.data.model.Quiz
 import com.roox.mcqquiz.viewmodel.QuizViewModel
