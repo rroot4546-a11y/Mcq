@@ -6,71 +6,87 @@
     android:orientation="vertical"
     android:background="@color/surface">
 
-    <!-- Header -->
+    <!-- Gradient Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/primary"
-        android:padding="24dp">
+        android:background="@drawable/gradient_header"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="40dp"
+        android:paddingBottom="28dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📚 MCQ Quiz"
-            android:textSize="28sp"
+            android:text="🧠"
+            android:textSize="40sp"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="MCQ Quiz"
+            android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-medium" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medical Board Exam Preparation"
-            android:textSize="14sp"
-            android:textColor="#B0BEC5"
+            android:text="AI-Powered Medical Board Prep"
+            android:textSize="15sp"
+            android:textColor="#C4B5FD"
             android:paddingTop="4dp" />
     </LinearLayout>
 
-    <!-- Action buttons -->
+    <!-- Action Buttons Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="@color/card_bg"
-        android:elevation="2dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnImportPdf"
-            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="📄 Import"
+            android:text="📄  Import PDF"
             android:textAllCaps="false"
+            android:textSize="13sp"
             android:layout_marginEnd="6dp"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="14dp"
+            app:backgroundTint="@color/primary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStats"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="📊 Stats"
+            android:text="📊  Stats"
             android:textAllCaps="false"
+            android:textSize="13sp"
             android:layout_marginEnd="6dp"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="14dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSettings"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="⚙️ AI"
+            android:text="⚙️  AI"
             android:textAllCaps="false"
-            app:cornerRadius="12dp" />
+            android:textSize="13sp"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/outline" />
     </LinearLayout>
 
     <ProgressBar
@@ -79,21 +95,47 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:indeterminateTint="@color/primary" />
 
-    <TextView
+    <!-- Empty State -->
+    <LinearLayout
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No quizzes yet.\n\nTap 📄 Import to load a PDF with MCQs!"
-        android:textAlignment="center"
-        android:textSize="16sp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:paddingTop="60dp"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:textColor="@color/text_secondary"
-        android:lineSpacingExtra="4dp" />
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📚"
+            android:textSize="64sp"
+            android:paddingBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Quizzes Yet"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Import a PDF with MCQ questions to get started.\nSupports Davidson's, Harrison's, and more!"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp" />
+    </LinearLayout>
+
+    <!-- Quiz List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerQuizzes"
         android:layout_width="match_parent"

@@ -17,6 +17,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.view.View
 import com.roox.mcqquiz.R
 import com.roox.mcqquiz.data.model.Quiz
 import com.roox.mcqquiz.viewmodel.QuizViewModel
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnStats: Button
     private lateinit var btnSettings: Button
     private lateinit var progressBar: ProgressBar
-    private lateinit var tvEmpty: TextView
+    private lateinit var tvEmpty: View
 
     private val pdfPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface">
@@ -7,214 +8,348 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⚙️ AI Settings"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary"
-            android:paddingBottom="24dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Choose AI Provider:"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:paddingBottom="12dp" />
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp">
-
-            <RadioButton
-                android:id="@+id/radioGemini"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🤖 Google Gemini (Free API Key)"
-                android:textSize="15sp"
-                android:checked="true"
-                android:paddingBottom="4dp" />
-
-            <RadioButton
-                android:id="@+id/radioOllama"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🦙 Ollama (Self-hosted or Cloud)"
-                android:textSize="15sp"
-                android:paddingBottom="4dp" />
-
-            <RadioButton
-                android:id="@+id/radioCustom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🔧 Custom AI (OpenAI-compatible API)"
-                android:textSize="15sp" />
-        </RadioGroup>
-
-        <!-- Gemini -->
+        <!-- Header -->
         <LinearLayout
-            android:id="@+id/layoutGemini"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@drawable/gradient_header"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="36dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Free key from aistudio.google.com/apikey"
-                android:textSize="13sp"
-                android:textColor="@color/text_secondary"
-                android:paddingBottom="8dp" />
+                android:text="⚙️"
+                android:textSize="36sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Gemini API Key">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etApiKey"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:text="AI Settings"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:paddingTop="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Configure your AI explanation provider"
+                android:textSize="14sp"
+                android:textColor="#C4B5FD"
+                android:paddingTop="4dp" />
         </LinearLayout>
 
-        <!-- Ollama -->
         <LinearLayout
-            android:id="@+id/layoutOllama"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:padding="20dp">
 
+            <!-- Provider Selection -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Local: http://localhost:11434\nCloud: your server URL"
-                android:textSize="13sp"
-                android:textColor="@color/text_secondary"
-                android:paddingBottom="8dp" />
+                android:text="Choose Provider"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:paddingBottom="12dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
+            <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ollama Server URL"
-                android:paddingBottom="8dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etOllamaUrl"
+                android:paddingBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/radioGoogle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textUri"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:text="🔑  Google Account (No API key needed!)"
+                    android:textSize="15sp"
+                    android:paddingBottom="6dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Model Name">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etOllamaModel"
+                <RadioButton
+                    android:id="@+id/radioGemini"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:text="🤖  Gemini API Key (Free)"
+                    android:textSize="15sp"
+                    android:checked="true"
+                    android:paddingBottom="6dp" />
+
+                <RadioButton
+                    android:id="@+id/radioOllama"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🦙  Ollama (Local / Cloud)"
+                    android:textSize="15sp"
+                    android:paddingBottom="6dp" />
+
+                <RadioButton
+                    android:id="@+id/radioCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔧  Custom API (OpenAI-compatible)"
+                    android:textSize="15sp" />
+            </RadioGroup>
+
+            <!-- Google Sign-In -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutGoogle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider"
+                app:cardBackgroundColor="@color/card_bg"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sign in with your Google account.\nNo API key needed — uses your Google account to access Gemini."
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:lineSpacingExtra="2dp"
+                        android:paddingBottom="14dp" />
+
+                    <Button
+                        android:id="@+id/btnGoogleSignIn"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="🔑  Sign in with Google"
+                        android:textAllCaps="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tvGoogleStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Not signed in"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingTop="10dp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Gemini Key -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutGemini"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider"
+                app:cardBackgroundColor="@color/card_bg"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Get a free key from aistudio.google.com/apikey"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="10dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Gemini API Key"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etApiKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Ollama -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutOllama"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider"
+                app:cardBackgroundColor="@color/card_bg"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Server URL"
+                        android:paddingBottom="8dp"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOllamaUrl"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textUri"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Model Name"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOllamaModel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Custom -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider"
+                app:cardBackgroundColor="@color/card_bg"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="OpenRouter, Together AI, Groq, etc."
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="10dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API URL"
+                        android:paddingBottom="8dp"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCustomUrl"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textUri"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Model Name"
+                        android:paddingBottom="8dp"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCustomModel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API Key"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCustomApiKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="8dp"
+                android:paddingBottom="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTest"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="🔍  Test"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="14dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="💾  Save"
+                    android:textAllCaps="false"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="@color/primary" />
+            </LinearLayout>
+
+            <!-- Status -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/surface_variant">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No AI provider configured"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:padding="14dp"
+                    android:gravity="center" />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-
-        <!-- Custom AI -->
-        <LinearLayout
-            android:id="@+id/layoutCustom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Any OpenAI-compatible API:\nOpenRouter, Together AI, Groq, local LLMs, etc.\n\nURL format: https://api.example.com/v1/chat/completions"
-                android:textSize="13sp"
-                android:textColor="@color/text_secondary"
-                android:paddingBottom="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="API Base URL"
-                android:paddingBottom="8dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCustomUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textUri"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Model Name (e.g. gpt-4o, claude-3, llama-3)"
-                android:paddingBottom="8dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCustomModel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="API Key (if required)">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCustomApiKey"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:fontFamily="monospace" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
-        <!-- Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="20dp"
-            android:paddingBottom="16dp">
-
-            <Button
-                android:id="@+id/btnTest"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="🔍 Test"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="💾 Save" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No AI provider configured"
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:padding="12dp"
-            android:background="@color/divider" />
     </LinearLayout>
 </ScrollView>

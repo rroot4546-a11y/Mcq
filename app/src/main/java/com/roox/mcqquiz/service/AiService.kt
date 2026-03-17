@@ -11,7 +11,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-enum class AiProvider { GEMINI, OLLAMA, CUSTOM }
+enum class AiProvider { GEMINI, GOOGLE, OLLAMA, CUSTOM }
 
 class AiService(
     private val provider: AiProvider,
@@ -42,6 +42,7 @@ class AiService(
         val prompt = buildPrompt(questionText, options, correctAnswer)
         return when (provider) {
             AiProvider.GEMINI -> callGemini(prompt)
+            AiProvider.GOOGLE -> callGemini(prompt) // Google sign-in also uses Gemini SDK
             AiProvider.OLLAMA -> callOllama(prompt)
             AiProvider.CUSTOM -> callCustom(prompt)
         }
@@ -51,6 +52,7 @@ class AiService(
         return try {
             val response = when (provider) {
                 AiProvider.GEMINI -> callGemini("Reply with OK")
+                AiProvider.GOOGLE -> callGemini("Reply with OK")
                 AiProvider.OLLAMA -> callOllama("Reply with OK")
                 AiProvider.CUSTOM -> callCustom("Reply with OK")
             }
@@ -181,6 +183,7 @@ class AiService(
     companion object {
         fun fromPrefs(prefs: android.content.SharedPreferences): AiService {
             val provider = when (prefs.getString("ai_provider", "gemini")) {
+                "google" -> AiProvider.GOOGLE
                 "ollama" -> AiProvider.OLLAMA
                 "custom" -> AiProvider.CUSTOM
                 else -> AiProvider.GEMINI

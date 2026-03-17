@@ -6,14 +6,14 @@
     android:orientation="vertical"
     android:background="@color/surface">
 
-    <!-- Top Bar -->
+    <!-- Top Bar with gradient -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/card_bg"
-        android:elevation="2dp"
-        android:padding="16dp">
+        android:background="@drawable/gradient_header"
+        android:padding="20dp"
+        android:paddingTop="32dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,16 +26,22 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/primary" />
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/tvProgress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@color/text_secondary" />
+                android:textColor="#C4B5FD"
+                android:background="@drawable/card_rounded"
+                android:backgroundTint="#2AFFFFFF"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
         </LinearLayout>
 
         <ProgressBar
@@ -43,13 +49,14 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="6dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:max="100"
             android:progress="0"
-            android:progressDrawable="@android:drawable/progress_horizontal" />
+            android:progressTint="@color/white"
+            android:progressBackgroundTint="#44FFFFFF" />
     </LinearLayout>
 
-    <!-- Scrollable content -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -67,21 +74,37 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
                 app:cardBackgroundColor="@color/card_bg">
 
-                <TextView
-                    android:id="@+id/tvQuestionText"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:lineSpacingExtra="4dp"
-                    android:padding="20dp"
-                    android:textColor="@color/text_primary"
-                    android:maxLines="50"
-                    android:ellipsize="none" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="❓ Question"
+                        android:textSize="12sp"
+                        android:textColor="@color/primary"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:paddingBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvQuestionText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:lineSpacingExtra="5dp"
+                        android:textColor="@color/text_primary"
+                        android:maxLines="50"
+                        android:ellipsize="none" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Options -->
@@ -90,7 +113,7 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="56dp"
                 android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textSize="15sp"
@@ -102,15 +125,16 @@
                 android:singleLine="false"
                 android:maxLines="10"
                 android:ellipsize="none"
-                app:cornerRadius="12dp"
-                app:strokeWidth="2dp" />
+                app:cornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/outline" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOptionB"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="56dp"
                 android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textSize="15sp"
@@ -122,15 +146,16 @@
                 android:singleLine="false"
                 android:maxLines="10"
                 android:ellipsize="none"
-                app:cornerRadius="12dp"
-                app:strokeWidth="2dp" />
+                app:cornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/outline" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOptionC"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="56dp"
                 android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textSize="15sp"
@@ -142,15 +167,16 @@
                 android:singleLine="false"
                 android:maxLines="10"
                 android:ellipsize="none"
-                app:cornerRadius="12dp"
-                app:strokeWidth="2dp" />
+                app:cornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/outline" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOptionD"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="56dp"
                 android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textSize="15sp"
@@ -162,15 +188,16 @@
                 android:singleLine="false"
                 android:maxLines="10"
                 android:ellipsize="none"
-                app:cornerRadius="12dp"
-                app:strokeWidth="2dp" />
+                app:cornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/outline" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOptionE"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="56dp"
                 android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textSize="15sp"
@@ -183,63 +210,73 @@
                 android:maxLines="10"
                 android:ellipsize="none"
                 android:visibility="gone"
-                app:cornerRadius="12dp"
-                app:strokeWidth="2dp" />
+                app:cornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/outline" />
 
-            <!-- Result -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardResult"
+            <!-- Result Card -->
+            <TextView
+                android:id="@+id/tvResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:padding="16dp"
                 android:layout_marginTop="8dp"
-                android:visibility="gone"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/tvResult"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="16dp"
-                    android:visibility="gone" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Explanation -->
+            <!-- Explanation Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFF8E1">
+                app:strokeWidth="1dp"
+                app:strokeColor="#FDE68A"
+                app:cardBackgroundColor="#FFFBEB">
 
-                <TextView
-                    android:id="@+id/tvExplanation"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp"
-                    android:textColor="#5D4037"
-                    android:padding="16dp"
-                    android:maxLines="100"
-                    android:ellipsize="none"
-                    android:visibility="gone" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📖 Explanation"
+                        android:textSize="12sp"
+                        android:textColor="#92400E"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:paddingBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvExplanation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="#78350F"
+                        android:maxLines="100"
+                        android:ellipsize="none"
+                        android:visibility="gone" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- AI Explain Button -->
+            <!-- AI Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAiExplain"
-                style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
                 android:text="🤖  Get AI Explanation"
                 android:textAllCaps="false"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:layout_marginTop="12dp"
                 android:visibility="gone"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="14dp"
+                app:backgroundTint="@color/ai_accent" />
 
             <ProgressBar
                 android:id="@+id/progressLoading"
@@ -247,6 +284,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
+                android:indeterminateTint="@color/ai_accent"
                 android:visibility="gone" />
 
             <!-- AI Explanation Card -->
@@ -254,57 +292,79 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#C4B5FD"
                 app:cardBackgroundColor="@color/ai_bg">
 
-                <TextView
-                    android:id="@+id/tvAiExplanation"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp"
-                    android:textColor="@color/ai_text"
-                    android:padding="16dp"
-                    android:maxLines="200"
-                    android:ellipsize="none"
-                    android:visibility="gone" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🤖 AI Analysis"
+                        android:textSize="12sp"
+                        android:textColor="@color/ai_accent"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:paddingBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvAiExplanation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="@color/ai_text"
+                        android:maxLines="200"
+                        android:ellipsize="none"
+                        android:visibility="gone" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Spacer -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="80dp" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Nav -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@color/card_bg"
         android:elevation="8dp"
-        android:padding="12dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPrevious"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="← Previous"
             android:textAllCaps="false"
             android:layout_marginEnd="8dp"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/outline" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="Next →"
             android:textAllCaps="false"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="14dp"
+            app:backgroundTint="@color/primary" />
     </LinearLayout>
 </LinearLayout>
