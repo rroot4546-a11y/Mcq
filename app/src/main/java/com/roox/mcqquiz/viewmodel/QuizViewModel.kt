@@ -158,21 +158,27 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     fun requestAiExplanation(prefs: android.content.SharedPreferences) {
         val question = _currentQuestion.value ?: return
         viewModelScope.launch {
-            _isLoading.value = true
-            val aiService = AiService.fromPrefs(prefs)
-            val options = listOfNotNull(
-                "A) ${question.optionA}",
-                "B) ${question.optionB}",
-                "C) ${question.optionC}",
-                "D) ${question.optionD}",
-                question.optionE?.let { "E) $it" }
-            )
-            val explanation = aiService.getExplanation(
-                question.questionText, options, question.correctAnswer
-            )
-            _aiExplanation.value = explanation
-            repository.updateQuestion(question.copy(aiExplanation = explanation))
-            _isLoading.value = false
+            try {
+                _isLoading.postValue(true)
+                val aiService = AiService.fromPrefs(prefs)
+                val options = listOfNotNull(
+                    "A) ${question.optionA}",
+                    "B) ${question.optionB}",
+                    "C) ${question.optionC}",
+                    "D) ${question.optionD}",
+                    question.optionE?.let { "E) $it" }
+                )
+                val explanation = aiService.getExplanation(
+                    question.questionText, options, question.correctAnswer
+                )
+                _aiExplanation.postValue(explanation)
+                repository.updateQuestion(question.copy(aiExplanation = explanation))
+            } catch (e: Exception) {
+                Log.e("MCQQuiz", "AI Error: ${e.message}", e)
+                _aiExplanation.postValue("❌ Error: ${e.message}\n\nPlease check your AI settings.")
+            } finally {
+                _isLoading.postValue(false)
+            }
         }
     }
 

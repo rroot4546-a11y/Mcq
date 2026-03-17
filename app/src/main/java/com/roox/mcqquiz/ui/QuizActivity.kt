@@ -112,16 +112,10 @@ class QuizActivity : AppCompatActivity() {
         btnPrevious.setOnClickListener { viewModel.previousQuestion() }
 
         btnAiExplain.setOnClickListener {
-            val provider = prefs.getString("ai_provider", "gemini")
-            val hasConfig = when (provider) {
-                "ollama" -> prefs.getString("ollama_url", "")?.isNotBlank() == true
-                "custom" -> prefs.getString("custom_api_url", "")?.isNotBlank() == true
-                else -> prefs.getString("gemini_api_key", "")?.isNotBlank() == true
-            }
-            if (!hasConfig) {
-                Toast.makeText(this, "Please configure AI in Settings first", Toast.LENGTH_LONG).show()
-            } else {
+            try {
                 viewModel.requestAiExplanation(prefs)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

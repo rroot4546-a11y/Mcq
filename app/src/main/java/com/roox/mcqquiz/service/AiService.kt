@@ -82,6 +82,9 @@ class AiService(
 
     private suspend fun callGemini(prompt: String): String {
         return try {
+            if (apiKey.isBlank()) {
+                return "⚠️ No API key configured.\n\nGo to Settings → choose Gemini API Key → enter your key from aistudio.google.com/apikey\n\nOr choose another AI provider."
+            }
             val response = geminiModel.generateContent(prompt)
             response.text ?: "No explanation generated."
         } catch (e: Exception) {
