@@ -134,11 +134,10 @@ class AiService(
                     val json = JsonParser.parseString(responseBody).asJsonObject
                     val candidates = json.getAsJsonArray("candidates")
                     if (candidates != null && candidates.size() > 0) {
-                        val content = candidates[0].asJsonObject
+                        val parts = candidates.get(0).asJsonObject
                             .getAsJsonObject("content")
                             .getAsJsonArray("parts")
-                            [0].asJsonObject
-                            .get("text").asString
+                        val content = parts.get(0).asJsonObject.get("text").asString
                         cont.resume(content)
                     } else {
                         cont.resume("No response from Gemini")
