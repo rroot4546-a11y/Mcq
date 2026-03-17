@@ -1,6 +1,6 @@
 package com.roox.mcqquiz.service
 
-import com.google.ai.client.generativeai.GenerativeModel
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import okhttp3.*
@@ -8,7 +8,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 enum class AiProvider { GEMINI, GOOGLE, OLLAMA, CUSTOM }
@@ -22,9 +21,27 @@ class AiService(
     private val customModel: String = "",
     private val customApiKey: String = ""
 ) {
+    companion object {
+        private const val TAG = "AiService"
+        private const val GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
-    private val geminiModel by lazy {
-        GenerativeModel(modelName = "gemini-2.0-flash", apiKey = apiKey)
+        fun fromPrefs(prefs: android.content.SharedPreferences): AiService {
+            val provider = when (prefs.getString("ai_provider", "gemini")) {
+                "google" -> AiProvider.GOOGLE
+                "ollama" -> AiProvider.OLLAMA
+                "custom" -> AiProvider.CUSTOM
+                else -> AiProvider.GEMINI
+            }
+            return AiService(
+                provider = provider,
+                apiKey = prefs.getString("gemini_api_key", "") ?: "",
+                ollamaUrl = prefs.getString("ollama_url", "") ?: "",
+                ollamaModel = prefs.getString("ollama_model", "llama3") ?: "llama3",
+                customUrl = prefs.getString("custom_api_url", "") ?: "",
+                customModel = prefs.getString("custom_model", "") ?: "",
+                customApiKey = prefs.getString("custom_api_key", "") ?: ""
+            )
+        }
     }
 
     private val httpClient = OkHttpClient.Builder()
@@ -40,24 +57,28 @@ class AiService(
         correctAnswer: String
     ): String {
         val prompt = buildPrompt(questionText, options, correctAnswer)
-        return when (provider) {
-            AiProvider.GEMINI -> callGemini(prompt)
-            AiProvider.GOOGLE -> callGemini(prompt) // Google sign-in also uses Gemini SDK
-            AiProvider.OLLAMA -> callOllama(prompt)
-            AiProvider.CUSTOM -> callCustom(prompt)
+        return try {
+            when (provider) {
+                AiProvider.GEMINI, AiProvider.GOOGLE -> callGeminiHttp(prompt)
+                AiProvider.OLLAMA -> callOllama(prompt)
+                AiProvider.CUSTOM -> callCustom(prompt)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getExplanation error", e)
+            "❌ Error: ${e.message}"
         }
     }
 
     suspend fun testConnection(): Boolean {
         return try {
             val response = when (provider) {
-                AiProvider.GEMINI -> callGemini("Reply with OK")
-                AiProvider.GOOGLE -> callGemini("Reply with OK")
+                AiProvider.GEMINI, AiProvider.GOOGLE -> callGeminiHttp("Reply with OK")
                 AiProvider.OLLAMA -> callOllama("Reply with OK")
                 AiProvider.CUSTOM -> callCustom("Reply with OK")
             }
-            response.isNotBlank() && !response.startsWith("Error")
+            response.isNotBlank() && !response.startsWith("❌")
         } catch (e: Exception) {
+            Log.e(TAG, "testConnection error", e)
             false
         }
     }
@@ -80,27 +101,17 @@ class AiService(
         append("\nKeep it concise but thorough. Use bullet points.")
     }
 
-    private suspend fun callGemini(prompt: String): String {
-        return try {
-            if (apiKey.isBlank()) {
-                return "⚠️ No API key configured.\n\nGo to Settings → choose Gemini API Key → enter your key from aistudio.google.com/apikey\n\nOr choose another AI provider."
-            }
-            val response = geminiModel.generateContent(prompt)
-            response.text ?: "No explanation generated."
-        } catch (e: Exception) {
-            "Error: ${e.message}"
+    /**
+     * Direct HTTP call to Gemini API — no SDK, no crashes
+     */
+    private suspend fun callGeminiHttp(prompt: String): String = suspendCoroutine { cont ->
+        if (apiKey.isBlank()) {
+            cont.resume("⚠️ No API key.\n\nGo to Settings → Gemini API Key → enter key from aistudio.google.com/apikey")
+            return@suspendCoroutine
         }
-    }
 
-    private suspend fun callOllama(prompt: String): String = suspendCoroutine { cont ->
-        val baseUrl = ollamaUrl.trimEnd('/')
-        val url = "$baseUrl/api/generate"
-
-        val body = gson.toJson(mapOf(
-            "model" to ollamaModel,
-            "prompt" to prompt,
-            "stream" to false
-        ))
+        val url = "$GEMINI_URL?key=$apiKey"
+        val body = """{"contents":[{"parts":[{"text":${gson.toJson(prompt)}}]}]}"""
 
         val request = Request.Builder()
             .url(url)
@@ -109,97 +120,120 @@ class AiService(
 
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                cont.resume("Error: ${e.message}")
+                Log.e(TAG, "Gemini HTTP error", e)
+                cont.resume("❌ Network error: ${e.message}")
             }
             override fun onResponse(call: Call, response: Response) {
                 try {
                     val responseBody = response.body?.string() ?: ""
                     if (!response.isSuccessful) {
-                        cont.resume("Error (${response.code}): $responseBody")
+                        Log.e(TAG, "Gemini HTTP ${response.code}: $responseBody")
+                        cont.resume("❌ Gemini error (${response.code}): Check your API key in Settings")
                         return
                     }
-                    val json = gson.fromJson(responseBody, Map::class.java)
-                    cont.resume(json["response"]?.toString() ?: "No response")
+                    val json = JsonParser.parseString(responseBody).asJsonObject
+                    val candidates = json.getAsJsonArray("candidates")
+                    if (candidates != null && candidates.size() > 0) {
+                        val content = candidates[0].asJsonObject
+                            .getAsJsonObject("content")
+                            .getAsJsonArray("parts")
+                            [0].asJsonObject
+                            .get("text").asString
+                        cont.resume(content)
+                    } else {
+                        cont.resume("No response from Gemini")
+                    }
                 } catch (e: Exception) {
-                    cont.resume("Error: ${e.message}")
+                    Log.e(TAG, "Gemini parse error", e)
+                    cont.resume("❌ Parse error: ${e.message}")
                 }
             }
         })
     }
 
-    /**
-     * Calls any OpenAI-compatible API (OpenRouter, Together, Groq, etc.)
-     * POST to customUrl with:
-     * { "model": "...", "messages": [{"role":"user","content":"..."}] }
-     */
-    private suspend fun callCustom(prompt: String): String = suspendCoroutine { cont ->
-        val url = customUrl.trimEnd('/')
+    private suspend fun callOllama(prompt: String): String = suspendCoroutine { cont ->
+        if (ollamaUrl.isBlank()) {
+            cont.resume("⚠️ No Ollama URL configured. Go to Settings.")
+            return@suspendCoroutine
+        }
 
+        val baseUrl = ollamaUrl.trimEnd('/')
+        val url = "$baseUrl/api/generate"
+        val body = gson.toJson(mapOf("model" to ollamaModel, "prompt" to prompt, "stream" to false))
+
+        val request = Request.Builder()
+            .url(url)
+            .post(body.toRequestBody("application/json".toMediaType()))
+            .build()
+
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                cont.resume("❌ Ollama error: ${e.message}")
+            }
+            override fun onResponse(call: Call, response: Response) {
+                try {
+                    val responseBody = response.body?.string() ?: ""
+                    if (!response.isSuccessful) {
+                        cont.resume("❌ Ollama error (${response.code}): $responseBody")
+                        return
+                    }
+                    val json = gson.fromJson(responseBody, Map::class.java)
+                    cont.resume(json["response"]?.toString() ?: "No response")
+                } catch (e: Exception) {
+                    cont.resume("❌ Parse error: ${e.message}")
+                }
+            }
+        })
+    }
+
+    private suspend fun callCustom(prompt: String): String = suspendCoroutine { cont ->
+        if (customUrl.isBlank()) {
+            cont.resume("⚠️ No Custom API URL configured. Go to Settings.")
+            return@suspendCoroutine
+        }
+
+        val url = customUrl.trimEnd('/')
         val messagesJson = gson.toJson(mapOf(
             "model" to customModel,
-            "messages" to listOf(
-                mapOf("role" to "user", "content" to prompt)
-            ),
+            "messages" to listOf(mapOf("role" to "user", "content" to prompt)),
             "max_tokens" to 2000
         ))
 
         val requestBuilder = Request.Builder()
             .url(url)
             .post(messagesJson.toRequestBody("application/json".toMediaType()))
+            .addHeader("Content-Type", "application/json")
 
         if (customApiKey.isNotBlank()) {
             requestBuilder.addHeader("Authorization", "Bearer $customApiKey")
         }
-        requestBuilder.addHeader("Content-Type", "application/json")
 
         httpClient.newCall(requestBuilder.build()).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                cont.resume("Error: ${e.message}")
+                cont.resume("❌ Custom API error: ${e.message}")
             }
             override fun onResponse(call: Call, response: Response) {
                 try {
                     val responseBody = response.body?.string() ?: ""
                     if (!response.isSuccessful) {
-                        cont.resume("Error (${response.code}): $responseBody")
+                        cont.resume("❌ API error (${response.code}): $responseBody")
                         return
                     }
-                    // Parse OpenAI-style response
                     val json = JsonParser.parseString(responseBody).asJsonObject
                     val choices = json.getAsJsonArray("choices")
                     if (choices != null && choices.size() > 0) {
                         val message = choices[0].asJsonObject.getAsJsonObject("message")
                         cont.resume(message.get("content").asString)
                     } else {
-                        // Fallback: try to get "text" or "response" field
                         val text = json.get("text")?.asString
                             ?: json.get("response")?.asString
                             ?: responseBody
                         cont.resume(text)
                     }
                 } catch (e: Exception) {
-                    cont.resume("Error: ${e.message}")
+                    cont.resume("❌ Parse error: ${e.message}")
                 }
             }
         })
-    }
-
-    companion object {
-        fun fromPrefs(prefs: android.content.SharedPreferences): AiService {
-            val provider = when (prefs.getString("ai_provider", "gemini")) {
-                "google" -> AiProvider.GOOGLE
-                "ollama" -> AiProvider.OLLAMA
-                "custom" -> AiProvider.CUSTOM
-                else -> AiProvider.GEMINI
-            }
-            return AiService(
-                provider = provider,
-                apiKey = prefs.getString("gemini_api_key", "") ?: "",
-                ollamaUrl = prefs.getString("ollama_url", "") ?: "",
-                ollamaModel = prefs.getString("ollama_model", "llama3") ?: "llama3",
-                customUrl = prefs.getString("custom_api_url", "") ?: "",
-                customModel = prefs.getString("custom_model", "") ?: "",
-                customApiKey = prefs.getString("custom_api_key", "") ?: ""
-            )
-        }
     }
 }

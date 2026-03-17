@@ -61,9 +61,6 @@ dependencies {
     // PDF Parsing
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
-    // Google Generative AI (Gemini) - Official SDK
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
-
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
