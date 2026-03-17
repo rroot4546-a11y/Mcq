@@ -8,7 +8,6 @@ import com.roox.mcqquiz.MCQApplication
 import com.roox.mcqquiz.data.model.Question
 import com.roox.mcqquiz.data.model.Quiz
 import com.roox.mcqquiz.service.AiService
-import com.roox.mcqquiz.service.AiProvider
 import com.roox.mcqquiz.service.PdfParserService
 import kotlinx.coroutines.launch
 
@@ -175,7 +174,7 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 repository.updateQuestion(question.copy(aiExplanation = explanation))
             } catch (e: Exception) {
                 Log.e("MCQQuiz", "AI Error: ${e.message}", e)
-                _aiExplanation.postValue("❌ Error: ${e.message}\n\nPlease check your AI settings.")
+                _aiExplanation.postValue("❌ Error: ${e.message}\n\nCheck your AI settings.")
             } finally {
                 _isLoading.postValue(false)
             }

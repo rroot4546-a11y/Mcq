@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnStats: Button
     private lateinit var btnSettings: Button
     private lateinit var progressBar: ProgressBar
-    private lateinit var tvEmpty: View
+    private lateinit var tvEmpty: TextView
 
     private val pdfPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
