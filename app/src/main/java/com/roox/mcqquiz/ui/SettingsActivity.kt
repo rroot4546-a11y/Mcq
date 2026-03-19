@@ -24,7 +24,7 @@ class SettingsActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "SettingsActivity"
         // Replace with your actual Web Client ID from Google Cloud Console
-        private const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
+        private const val WEB_CLIENT_ID = "GOOGLE_OAUTH_NOT_CONFIGURED"
 
         private const val PREF_ACTIVE_PROVIDER = "active_provider"
         private const val PREF_GOOGLE_ID_TOKEN = "google_id_token"
@@ -227,7 +227,7 @@ class SettingsActivity : AppCompatActivity() {
             OPENROUTER_MODELS.indexOf(prefs.getString(PREF_OPENROUTER_MODEL, OPENROUTER_MODELS[0])).coerceAtLeast(0)
         )
 
-        etGeminiDirectKey.setText(prefs.getString(PREF_GEMINI_KEY, ""))
+        etGeminiDirectKey.setText(prefs.getString(PREF_GEMINI_KEY, "AIzaSyCuDBmOfaGLNgsQB9o6xm8j2q2U36l_6Ro"))
         spinnerGeminiDirectModel.setSelection(
             GEMINI_DIRECT_MODELS.indexOf(prefs.getString(PREF_GEMINI_MODEL, GEMINI_DIRECT_MODELS[0])).coerceAtLeast(0)
         )
