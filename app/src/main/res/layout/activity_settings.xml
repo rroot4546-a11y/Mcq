@@ -9,158 +9,670 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="16dp">
 
         <!-- Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚙️ AI Settings"
+            android:text="&#x2699;&#xFE0F; AI Settings"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#1a1a2e"
-            android:paddingBottom="8dp" />
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Configure OpenRouter to get AI explanations based on Harrison's &amp; Davidson's"
+            android:text="Choose your AI provider for explanations"
             android:textSize="14sp"
             android:textColor="#666666"
-            android:paddingBottom="24dp" />
+            android:layout_marginBottom="16dp" />
 
-        <!-- API Key -->
+        <!-- Active Provider Selector -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="16dp">
+            app:cardElevation="3dp"
+            android:layout_marginBottom="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔑 OpenRouter API Key"
+                    android:text="Active Provider"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#1a1a2e"
-                    android:paddingBottom="4dp" />
+                    android:layout_marginBottom="12dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Get your free key from openrouter.ai/keys"
-                    android:textSize="13sp"
-                    android:textColor="#888888"
-                    android:paddingBottom="12dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
+                <RadioGroup
+                    android:id="@+id/rgActiveProvider"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="sk-or-v1-..."
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                    android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etApiKey"
+                    <RadioButton
+                        android:id="@+id/rbGoogleOAuth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:fontFamily="monospace"
-                        android:textSize="14sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="Google AI (Free — OAuth)"
+                        android:textSize="14sp"
+                        android:padding="6dp" />
+
+                    <RadioButton
+                        android:id="@+id/rbOpenRouter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="OpenRouter"
+                        android:textSize="14sp"
+                        android:padding="6dp" />
+
+                    <RadioButton
+                        android:id="@+id/rbGeminiDirect"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Gemini Direct (AI Studio key)"
+                        android:textSize="14sp"
+                        android:padding="6dp" />
+
+                    <RadioButton
+                        android:id="@+id/rbOpenAI"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="OpenAI Direct"
+                        android:textSize="14sp"
+                        android:padding="6dp" />
+
+                    <RadioButton
+                        android:id="@+id/rbAnthropic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Anthropic Direct"
+                        android:textSize="14sp"
+                        android:padding="6dp" />
+
+                </RadioGroup>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Model -->
+        <!-- Section A: Google OAuth -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardGoogleOAuth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🤖 AI Model"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1a1a2e"
-                    android:paddingBottom="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Default: Gemini 2.0 Flash (fast &amp; free)\nOther options: google/gemini-2.5-pro-preview, anthropic/claude-sonnet-4, openai/gpt-4o"
-                    android:textSize="13sp"
-                    android:textColor="#888888"
-                    android:paddingBottom="12dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
+                <LinearLayout
+                    android:id="@+id/headerGoogleOAuth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Model name"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etModel"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Google AI (Free)"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1a1a2e" />
+
+                    <TextView
+                        android:id="@+id/tvGoogleActiveCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvGoogleExpandIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#9660;"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyGoogleOAuth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:paddingTop="0dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sign in with your Google account to use Gemini 2.0 Flash for free — no API key needed."
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutSignedOut"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:textSize="14sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnGoogleSignIn"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:text="Sign in with Google"
+                            android:textAllCaps="false"
+                            android:textSize="15sp"
+                            style="@style/Widget.Material3.Button.OutlinedButton" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutSignedIn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvSignedInEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="14sp"
+                            android:textColor="#1a1a2e"
+                            android:background="#E8F5E9"
+                            android:padding="10dp"
+                            android:layout_marginBottom="10dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnGoogleSignOut"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Sign Out"
+                            android:textAllCaps="false"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            app:strokeColor="#F44336" />
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Buttons -->
-        <LinearLayout
+        <!-- Section B: OpenRouter -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardOpenRouter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="16dp">
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="10dp">
 
-            <Button
-                android:id="@+id/btnTest"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_weight="1"
-                android:text="🔍 Test"
-                android:textAllCaps="false"
-                android:layout_marginEnd="8dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_weight="1"
-                android:text="💾 Save"
-                android:textAllCaps="false" />
-        </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/headerOpenRouter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
 
-        <!-- Status -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="OpenRouter"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1a1a2e" />
+
+                    <TextView
+                        android:id="@+id/tvOpenRouterActiveCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvOpenRouterExpandIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#9660;"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyOpenRouter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:paddingTop="0dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Get your free key from openrouter.ai/keys"
+                        android:textSize="13sp"
+                        android:textColor="#888888"
+                        android:layout_marginBottom="10dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API Key (sk-or-v1-...)"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOpenRouterKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Model"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#444444"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerOpenRouterModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/spinner_border"
+                        android:padding="8dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveOpenRouter"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Save"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section C: Gemini Direct -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardGeminiDirect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/headerGeminiDirect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Gemini Direct"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1a1a2e" />
+
+                    <TextView
+                        android:id="@+id/tvGeminiDirectActiveCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvGeminiDirectExpandIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#9660;"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyGeminiDirect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:paddingTop="0dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Get your free key from aistudio.google.com"
+                        android:textSize="13sp"
+                        android:textColor="#888888"
+                        android:layout_marginBottom="10dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API Key (AIza...)"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etGeminiDirectKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Model"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#444444"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerGeminiDirectModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/spinner_border"
+                        android:padding="8dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveGeminiDirect"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Save"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section D: OpenAI Direct -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardOpenAI"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/headerOpenAI"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="OpenAI Direct"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1a1a2e" />
+
+                    <TextView
+                        android:id="@+id/tvOpenAIActiveCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvOpenAIExpandIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#9660;"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyOpenAI"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:paddingTop="0dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API Key (sk-...)"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etOpenAIKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Model"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#444444"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerOpenAIModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/spinner_border"
+                        android:padding="8dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveOpenAI"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Save"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section E: Anthropic Direct -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAnthropic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/headerAnthropic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Anthropic Direct"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1a1a2e" />
+
+                    <TextView
+                        android:id="@+id/tvAnthropicActiveCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvAnthropicExpandIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#9660;"
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bodyAnthropic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:paddingTop="0dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="API Key (sk-ant-...)"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAnthropicKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Model"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#444444"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerAnthropicModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/spinner_border"
+                        android:padding="8dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveAnthropic"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Save"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Test Connection + Status -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTestConnection"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Test Active Provider"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="10dp" />
+
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter your OpenRouter API key to enable AI explanations"
+            android:text="Select a provider and configure it above"
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="#444444"
             android:gravity="center"
             android:padding="12dp"
-            android:background="#F0F0F0" />
+            android:background="#EEEEEE"
+            android:layout_marginBottom="24dp" />
 
     </LinearLayout>
 </ScrollView>
