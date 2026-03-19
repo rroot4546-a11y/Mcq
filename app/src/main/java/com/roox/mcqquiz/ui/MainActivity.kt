@@ -83,7 +83,8 @@ class MainActivity : AppCompatActivity() {
                     onStudy = { quiz -> startQuizActivity(quiz.id, "STUDY") },
                     onExam = { quiz -> startQuizActivity(quiz.id, "EXAM") },
                     onReview = { quiz -> startQuizActivity(quiz.id, "REVIEW") },
-                    onDelete = { quiz -> viewModel.deleteQuiz(quiz) }
+                    onDelete = { quiz -> viewModel.deleteQuiz(quiz) },
+                    getProgress = { quizId -> viewModel.getSavedProgress(quizId) }
                 )
             }
         }
@@ -126,12 +127,14 @@ class MainActivity : AppCompatActivity() {
         private val onStudy: (Quiz) -> Unit,
         private val onExam: (Quiz) -> Unit,
         private val onReview: (Quiz) -> Unit,
-        private val onDelete: (Quiz) -> Unit
+        private val onDelete: (Quiz) -> Unit,
+        private val getProgress: (Int) -> Int
     ) : RecyclerView.Adapter<QuizListAdapter.ViewHolder>() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvTitle: TextView = view.findViewById(R.id.tvQuizTitle)
             val tvInfo: TextView = view.findViewById(R.id.tvQuizInfo)
+            val tvProgress: TextView? = view.findViewById(R.id.tvProgressHint)
             val btnStudy: Button = view.findViewById(R.id.btnStudyMode)
             val btnExam: Button = view.findViewById(R.id.btnExamMode)
             val btnReview: Button = view.findViewById(R.id.btnReviewMode)
@@ -147,6 +150,16 @@ class MainActivity : AppCompatActivity() {
             val quiz = quizzes[position]
             holder.tvTitle.text = quiz.title
             holder.tvInfo.text = "${quiz.totalQuestions} questions | ${quiz.correctAnswers}/${quiz.answeredQuestions} correct"
+
+            // Show saved progress indicator
+            val savedIdx = getProgress(quiz.id)
+            if (savedIdx > 0 && quiz.totalQuestions > 0) {
+                holder.tvProgress?.visibility = View.VISIBLE
+                holder.tvProgress?.text = "▶ Resume from Q${savedIdx + 1}"
+            } else {
+                holder.tvProgress?.visibility = View.GONE
+            }
+
             holder.btnStudy.setOnClickListener { onStudy(quiz) }
             holder.btnExam.setOnClickListener { onExam(quiz) }
             holder.btnReview.setOnClickListener { onReview(quiz) }

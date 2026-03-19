@@ -84,17 +84,40 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private var currentQuizId: Int = -1
+
+    private fun getProgressPrefs() =
+        getApplication<Application>().getSharedPreferences("quiz_progress", android.content.Context.MODE_PRIVATE)
+
+    private fun savedProgressKey(quizId: Int) = "progress_quiz_$quizId"
+
+    fun getSavedProgress(quizId: Int): Int {
+        return getProgressPrefs().getInt(savedProgressKey(quizId), 0)
+    }
+
+    private fun saveProgress(quizId: Int, index: Int) {
+        getProgressPrefs().edit().putInt(savedProgressKey(quizId), index).apply()
+    }
+
     fun startQuiz(quizId: Int, mode: QuizMode = QuizMode.STUDY) {
         viewModelScope.launch {
             currentQuizMode = mode
+            currentQuizId = quizId
             currentQuestions = when (mode) {
                 QuizMode.REVIEW -> repository.getIncorrectQuestions(quizId)
                 else -> repository.getQuestionsForQuizSync(quizId)
             }
             _totalQuestions.value = currentQuestions.size
-            _questionIndex.value = 0
+
+            // Resume from saved progress only in STUDY mode
+            val startIndex = if (mode == QuizMode.STUDY) {
+                val saved = getSavedProgress(quizId)
+                if (saved < currentQuestions.size) saved else 0
+            } else 0
+
+            _questionIndex.value = startIndex
             if (currentQuestions.isNotEmpty()) {
-                _currentQuestion.value = currentQuestions[0]
+                _currentQuestion.value = currentQuestions[startIndex]
             }
             _answerResult.value = null
             _aiExplanation.value = ""
@@ -141,6 +164,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             _currentQuestion.value = currentQuestions[idx]
             _answerResult.value = null
             _aiExplanation.value = ""
+            // Save progress in STUDY mode
+            if (currentQuizMode == QuizMode.STUDY && currentQuizId != -1) {
+                saveProgress(currentQuizId, idx)
+            }
         }
     }
 
@@ -151,6 +178,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             _currentQuestion.value = currentQuestions[idx]
             _answerResult.value = null
             _aiExplanation.value = ""
+            // Save progress in STUDY mode
+            if (currentQuizMode == QuizMode.STUDY && currentQuizId != -1) {
+                saveProgress(currentQuizId, idx)
+            }
         }
     }
 
